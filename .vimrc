@@ -62,7 +62,10 @@ nnoremap <Leader>w : <esc><C-w>_
 nnoremap <Leader>s <esc>:w!<CR>
 "noremap <Leader>b <esc>:ls<CR>:b
 "next tab
-noremap <Leader>a <esc>:tabn<CR>
+noremap <Leader>a( <esc>ysiw(
+"
+"open the quick fix window
+noremap <Leader>v <esc>:copen<CR>
 "previous tab
 "noremap <Leader>s <esc>:tabp<CR>
 "Make current buffer the only buffe being shown
@@ -89,17 +92,26 @@ set path+=**
 autocmd BufWritePost *.c :TlistUpdate
 autocmd BufWritePost *.cpp :TlistUpdate
 autocmd BufWritePost *.h :TlistUpdate
+highlight Search guibg='Yellow' guifg='NONE'
+
+let g:DoxygenToolkit_briefTag_pre="@Description"
+let g:DoxygenToolkit_paramTag_pre="@Param "
+let g:DoxygenToolkit_returnTag="@Returns   "
+let g:DoxygenToolkit_blockHeader="----------------------------------------------------------------------"
+let g:DoxygenToolkit_blockFooter="----------------------------------------------------------------------"
+let g:DoxygenToolkit_authorName="Vikas MK"
+
 "Do tags and cscope. Do this in the top directory
 "map <F2> :!ctags -R * <CR>:set tag=tags<CR>:!cscope -Rbkq<CR>:cs add cscope.out<CR>
 "Only add these files to cscope
-map <F2> :!find `pwd` -name "*.c" -o -name "*.h" -o -name "*.cpp" > cscope.files<CR>:!ctags -R * <CR>:set tag=tags<CR>:!cscope -Rbq <CR>:cscope add cscope.out<CR>
+map <F2> :!find `pwd` -name "*.c" -o -name "*.h" -o -name"*.cpp" -name "*.hpp" > cscope.files<CR>:!ctags -R --languages=C,C++ --c++-kinds=+p --fields=+iaS --fields+=-l --extra=+q * <CR>:set tag=tags<CR>:!cscope -Rbq <CR>:cscope add cscope.out<CR>
 
 "map <F5> :!find . -iname "**.[ch]"
 map <F5> :!find . -iname "**"
 inoremap jk <esc>
 map <F12> :source ~/.vimrc<CR>
 map <F11> :new ~/.vimrc<CR>
-map <F8> :.!date<CR>
+map <F8> :.!"date +%e-%d-%Y"<CR>
 match ErrorMsg '\s\+$'
 nnoremap <Leader>rtw :%s/\s\+$//e<CR>
 nnoremap <Leader>df :!git difftool %<CR>
@@ -107,7 +119,9 @@ nnoremap <Leader>rs :%s/^ \+//<CR>
 set complete-=i
 filetype plugin on
 filetype indent on
-"autocmd BufWritePre * :%s/\s\+$//e
+"set omnifunc=syntaxcomplete#Complete
+"au FileType c setl ofu=ccomplete#CompleteCpp
+autocmd BufWritePre * :%s/\s\+$//e
 "
 if has('cscope')
     set cscopetag cscopeverbose
@@ -117,6 +131,7 @@ if has('cscope')
 
     cnoreabbrev csa cs add
     cnoreabbrev csf cs find
+    cnoreabbrev csff cs find file
     cnoreabbrev csk cs kill
     cnoreabbrev csr cs reset
     cnoreabbrev css cs show
@@ -171,7 +186,16 @@ syntax off
  set rtp+=~/.vim/bundle/ctrlp.vim
 "If buffer is open switch to it instead of opening another instance
 let g:ctrlp_switch_buffer = 1
+"Use find command instead of vim's inbuild commands
+let g:ctrlp_user_command = 'find %s -type f' " MacOSX/Linux
 
+" c style comments using *
+" let g:surround_42 = "/* \r */"
+
+ let g:surround_{char2nr("q")} = "“\r”"
+
+"let g:ycm_global_ycm_extra_conf = '~/scrips/.ycm_extra_conf.py'
+" minimal status line, only shows git branch
  " start vundle environment
  call vundle#begin()
 
@@ -180,10 +204,23 @@ let g:ctrlp_switch_buffer = 1
  Plugin 'gmarik/Vundle.vim'
  Plugin 'kien/ctrlp.vim'
  Plugin 'christoomey/vim-tmux-navigator'
-
- " to install a plugin add it here and run :PluginInstall.
- " to update the plugins run :PluginInstall! or :PluginUpdate
- " to delete a plugin remove it here and run :PluginClean
+ Plugin 'majutsushi/tagbar'
+ Plugin 'tpope/vim-fugitive'
+ Plugin 'tpope/vim-dispatch'
+ Plugin 'tpope/vim-surround'
+ Plugin 'tpope/vim-commentary'
+ Plugin 'Valloric/YouCompleteMe'
+ Plugin 'rdnetto/YCM-Generator'
+ Plugin 'xolox/vim-misc'
+ Plugin 'xolox/vim-notes'
+ Plugin 'mrtazz/DoxygenToolkit.vim'
+" Plugin 'scroolosse/syntastic.vim'
+ Plugin 'easymotion/vim-easymotion'
+ Plugin 'vim-airline/vim-airline'
+ Plugin 'vim-airline/vim-airline-themes'
+" to install a plugin add it here and run :PluginInstall.
+" to update the plugins run :PluginInstall! or :PluginUpdate
+" to delete a plugin remove it here and run :PluginClean
  "
 
  " YOUR LIST OF PLUGINS GOES HERE LIKE THIS:
@@ -191,6 +228,9 @@ let g:ctrlp_switch_buffer = 1
 
  " add plugins before this
  call vundle#end()
+ let g:airline#extensions#tabline#enabled = 1
+ let g:airline#extensions#tabline#left_sep = ' '
+ let g:airline#extensions#tabline#left_alt_sep = '|'
 
  " now (after vundle finished) it is save to turn filetype plugins on
 filetype plugin indent on
